@@ -9,7 +9,7 @@
   <meta name="author" content="Steve Saarinen">
 
   
-  <meta name="description" content="Blog Archive Recent Posts GitHub Repos Status updating... @saarinen on GitHub $.domReady(function(){ if (!window.jXHR){ var jxhr = document. &hellip;">
+  <meta name="description" content="Blog Archive Recent Posts GitHub Repos Status updating... @saarinen on GitHub $(document).ready(function(){ if (!window.jXHR){ var jxhr = document. &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -18,17 +18,16 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   
-  <link rel="canonical" href="http://saarinen.github.com/blog/archives/">
+  <link rel="canonical" href="http://saarinen.github.com/blog/archives">
   <link href="/favicon.png" rel="icon">
   <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
-  <script src="/javascripts/modernizr-2.0.js"></script>
-  <script src="/javascripts/ender.js"></script>
-  <script src="/javascripts/octopress.js" type="text/javascript"></script>
   <link href="/atom.xml" rel="alternate" title="Saarinen on Source" type="application/atom+xml">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
   <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
-<link href="http://fonts.googleapis.com/css?family=Arvo:400,400italic,700,700italic" rel="stylesheet" type="text/css">
+<link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
 <link href="http://fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
-<link href="http://fonts.googleapis.com/css?family=Playball" rel="stylesheet" type="text/css">
 
   
   <script type="text/javascript">
@@ -46,7 +45,7 @@
 
 </head>
 
-<body>
+<body   >
   <header role="banner"><hgroup>
   <h1><a href="/">Saarinen on Source</a></h1>
   
@@ -55,8 +54,7 @@
 </hgroup>
 
 </header>
-  <div id="navigation">
-    <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
   <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
   
 </ul>
@@ -74,11 +72,9 @@
 </ul>
 
 </nav>
-  </div>
-  <div id="body"  >
-    <div id="main">
-      <div id="content">
-        <div>
+  <div id="main">
+    <div id="content">
+      <div>
 <article role="article">
   
   <header>
@@ -113,7 +109,7 @@
   <a href="https://github.com/saarinen">@saarinen</a> on GitHub
   
   <script type="text/javascript">
-    $.domReady(function(){
+    $(document).ready(function(){
         if (!window.jXHR){
             var jxhr = document.createElement('script');
             jxhr.type = 'text/javascript';
@@ -153,7 +149,7 @@
     <li class="loading">Status updating...</li>
   </ul>
   <script type="text/javascript">
-    $.domReady(function(){
+    $(function(){
       getTwitterFeed("_saarinen", 5, false);
     });
   </script>
@@ -168,15 +164,15 @@
 </aside>
 
 
-      </div>
     </div>
-    <footer role="contentinfo"><p>
+  </div>
+  <footer role="contentinfo"><p>
   Copyright &copy; 2013 - Steve Saarinen -
-  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a>. Design by <a href="http://octopressthemes.com">Octopress Themes</a></span>
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
 </p>
 
 </footer>
-    
+  
 
 <script type="text/javascript">
       var disqus_shortname = 'saarinen';
@@ -190,6 +186,7 @@
       (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
     }());
 </script>
+
 
 
 
@@ -218,6 +215,5 @@
 
 
 
-  </div>
 </body>
 </html>
