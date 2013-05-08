@@ -1,0 +1,4 @@
+User-agent: *
+Disallow: 
+
+Sitemap: http://saarinen.github.io/sitemap.xml 
