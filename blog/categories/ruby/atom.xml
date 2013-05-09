@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <feed xmlns="http://www.w3.org/2005/Atom">
 
-  <title><![CDATA[~/dev]]></title>
-  <link href="http://saarinen.github.com/atom.xml" rel="self"/>
+  <title><![CDATA[Category: Ruby | ~/dev]]></title>
+  <link href="http://saarinen.github.com/blog/categories/ruby/atom.xml" rel="self"/>
   <link href="http://saarinen.github.com/"/>
   <updated>2013-05-08T21:53:18-07:00</updated>
   <id>http://saarinen.github.com/</id>
