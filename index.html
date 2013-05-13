@@ -264,39 +264,57 @@
 
 <p>This gives us the following routes:</p>
 
-<p>&lt;% codeblock %></p>
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>Prefix Verb   URI Pattern                                         Controller#Action
+</span><span class='line'>             tenants GET    /tenants(.:format)                                  tenants#index
+</span><span class='line'>                     POST   /tenants(.:format)                                  tenants#create
+</span><span class='line'>          new_tenant GET    /tenants/new(.:format)                              tenants#new
+</span><span class='line'>         edit_tenant GET    /tenants/:id/edit(.:format)                         tenants#edit
+</span><span class='line'>              tenant GET    /tenants/:id(.:format)                              tenants#show
+</span><span class='line'>                     PATCH  /tenants/:id(.:format)                              tenants#update
+</span><span class='line'>                     PUT    /tenants/:id(.:format)                              tenants#update
+</span><span class='line'>                     DELETE /tenants/:id(.:format)                              tenants#destroy
+</span><span class='line'>    property_tenants GET    /properties/:property_id/tenants(.:format)          tenants#index
+</span><span class='line'>                     POST   /properties/:property_id/tenants(.:format)          tenants#create
+</span><span class='line'> new_property_tenant GET    /properties/:property_id/tenants/new(.:format)      tenants#new
+</span><span class='line'>edit_property_tenant GET    /properties/:property_id/tenants/:id/edit(.:format) tenants#edit
+</span><span class='line'>     property_tenant GET    /properties/:property_id/tenants/:id(.:format)      tenants#show
+</span><span class='line'>                     PATCH  /properties/:property_id/tenants/:id(.:format)      tenants#update
+</span><span class='line'>                     PUT    /properties/:property_id/tenants/:id(.:format)      tenants#update
+</span><span class='line'>                     DELETE /properties/:property_id/tenants/:id(.:format)      tenants#destroy
+</span><span class='line'>          properties GET    /properties(.:format)                               properties#index
+</span><span class='line'>                     POST   /properties(.:format)                               properties#create
+</span><span class='line'>        new_property GET    /properties/new(.:format)                           properties#new
+</span><span class='line'>       edit_property GET    /properties/:id/edit(.:format)                      properties#edit
+</span><span class='line'>            property GET    /properties/:id(.:format)                           properties#show
+</span><span class='line'>                     PATCH  /properties/:id(.:format)                           properties#update
+</span><span class='line'>                     PUT    /properties/:id(.:format)                           properties#update
+</span><span class='line'>                     DELETE /properties/:id(.:format)                           properties#destroy</span></code></pre></td></tr></table></div></figure>
 
-<pre><code>          Prefix Verb   URI Pattern                                         Controller#Action
-         tenants GET    /tenants(.:format)                                  tenants#index
-                 POST   /tenants(.:format)                                  tenants#create
-      new_tenant GET    /tenants/new(.:format)                              tenants#new
-     edit_tenant GET    /tenants/:id/edit(.:format)                         tenants#edit
-          tenant GET    /tenants/:id(.:format)                              tenants#show
-                 PATCH  /tenants/:id(.:format)                              tenants#update
-                 PUT    /tenants/:id(.:format)                              tenants#update
-                 DELETE /tenants/:id(.:format)                              tenants#destroy
-property_tenants GET    /properties/:property_id/tenants(.:format)          tenants#index
-                 POST   /properties/:property_id/tenants(.:format)          tenants#create
-</code></pre>
-
-<p> new_property_tenant GET    /properties/:property_id/tenants/new(.:format)      tenants#new
-edit_property_tenant GET    /properties/:property_id/tenants/:id/edit(.:format) tenants#edit</p>
-
-<pre><code> property_tenant GET    /properties/:property_id/tenants/:id(.:format)      tenants#show
-                 PATCH  /properties/:property_id/tenants/:id(.:format)      tenants#update
-                 PUT    /properties/:property_id/tenants/:id(.:format)      tenants#update
-                 DELETE /properties/:property_id/tenants/:id(.:format)      tenants#destroy
-      properties GET    /properties(.:format)                               properties#index
-                 POST   /properties(.:format)                               properties#create
-    new_property GET    /properties/new(.:format)                           properties#new
-   edit_property GET    /properties/:id/edit(.:format)                      properties#edit
-        property GET    /properties/:id(.:format)                           properties#show
-                 PATCH  /properties/:id(.:format)                           properties#update
-                 PUT    /properties/:id(.:format)                           properties#update
-                 DELETE /properties/:id(.:format)                           properties#destroy
-</code></pre>
-
-<p>&lt;% endcodeblock %></p>
 
 <p>Now we have both root access to our Tenants as well as routes through our properties relationship! Success! Well, not yet.  If we use any of the root routes to Tenants, our controller is going to throw an error, as property_id is not being sent along.  Let&rsquo;s fix that right now:</p>
 
