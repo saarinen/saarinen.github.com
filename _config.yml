@@ -3,7 +3,7 @@
 # ----------------------- #
 
 url: http://saarinen.github.com
-title: Saarinen on Source
+title: ~/dev
 subtitle: Musings on Ruby, Rails, and Web Technologies
 author: Steve Saarinen
 simple_search: http://google.com/search
@@ -71,6 +71,9 @@ github_skip_forks: true
 # Twitter
 twitter_user: _saarinen
 twitter_tweet_button: true
+twitter_follow_button: true
+twitter_tweet_count: 5
+twitter_show_replies: false
 
 # Google +1
 google_plus_one: true
@@ -97,7 +100,7 @@ disqus_show_comment_count: false
 google_analytics_tracking_id: UA-40738542-1
 
 # Facebook Like
-facebook_like: true
+facebook_like: false
 
 navigation:
 - text: Home

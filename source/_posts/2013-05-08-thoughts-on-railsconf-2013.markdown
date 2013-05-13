@@ -1,0 +1,16 @@
+---
+layout: post
+title: "Thoughts on RailsConf 2013"
+date: 2013-05-08 13:37
+comments: true
+categories: [Ruby, Rails, RailsConf]
+---
+
+
+I left Portland this year with mixed feelings after the four days of <a href='http://www.railsconf.com/2013/'>RailsConf 2013</a>. Listening to DHH's opening keynote outlining the focus of the technology decisions made for the Rails codebase, (specifically, a focus on document based UI rather than a richer, thick client UI) I was prepared to look at the Rails 4 featureset, and decisions made for this latest version, from that world view.  Through the rest of the conference, talks and technologies presented often were in direct conflict with this direction.  Talks focusing on utilization of the new web socket <a href='http://tenderlovemaking.com/2012/07/30/is-it-live.html'>'Live Streaming'</a> framework for Rails 4, a focus on "Rails API" architectures using thick clients and JSON transport mediums, and a recurring focus on JavaScript MVC libraries such as ember.js had me questioning whether the community is seeing and embracing the same "Rails is document based" vision as DHH.  I am in agreement with DHH's vision of not diluting the Rails stack to attempt to "be everything to everyone", but enjoyed haring from those who are pushing their visions of where the stack should go.
+
+Several talks (such as one entitled 'Cache = Cash') demonstrated one alignment of the Rails community: the quest for performance.  Many of the new technologies for Rails 4, including the new (and contentious) <a href='https://github.com/rails/turbolinks/' target='_blank'>TurboLinks</a> framework, have been introduced to increase end user performance.  I am still on the fence regarding the usefulness of the <a href='https://github.com/rails/turbolinks/' target='_blank'>TurboLinks</a> framework, or even whether the implementation is fully baked enough for production web sites.  For example: when developing for an ad-supported application, dealing with third party JavaScript is a constant headache but a necessary evil.  Interrupting the standard request/response model of the web page (which <a href='https://github.com/rails/turbolinks/' target='_blank'>TurboLinks</a> does), and the browser events associated with these actions may have far reaching impacts on the viability of code that we have no organizational control over.  Opting out of the <a href='https://github.com/rails/turbolinks/' target='_blank'>TurboLinks</a> functionality seems to be grossly manual and error prone, requiring all generated links to be specifically marked up.  There may be ways around this but further investigation is needed. Fodder for another Blog post perhaps.
+
+All in all, my biggest takeaway from <a href='http://www.railsconf.com/2013/'>RailsConf 2013</a>. was motivation to contribute to the open source projects built to the benefit of a great many engineers and organization.  The inspiring work shown at the conference, and the people behind them, are truly the engine powering the growth we have seen in the Rails ecosystem.
+
+Countdown to RubyConf?

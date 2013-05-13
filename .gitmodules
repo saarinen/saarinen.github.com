@@ -4,3 +4,6 @@
 [submodule ".themes/budget-bumbago"]
 	path = .themes/budget-bumbago
 	url = git://github.com/octopress-themes/budget-bumbago.git
+[submodule ".themes/murky-mussels"]
+	path = .themes/murky-mussels
+	url = git://github.com/octopress-themes/murky-mussels.git
