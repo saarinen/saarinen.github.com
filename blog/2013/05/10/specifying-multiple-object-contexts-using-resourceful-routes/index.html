@@ -5,7 +5,7 @@
 <!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <title>~/dev</title>
+  <title>Resourceful Routes in the Real World - ~/dev</title>
   <meta name="author" content="Steve Saarinen">
 
   
@@ -18,7 +18,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   
-  <link rel="canonical" href="http://saarinen.github.com">
+  <link rel="canonical" href="http://saarinen.github.com/blog/2013/05/10/specifying-multiple-object-contexts-using-resourceful-routes">
   <link href="/favicon.png" rel="icon">
   <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
   <link href="/atom.xml" rel="alternate" title="~/dev" type="application/atom+xml">
@@ -75,15 +75,12 @@
 </nav>
   <div id="main">
     <div id="content">
-      <div class="blog-index">
+      <div>
+<article class="hentry" role="article">
   
-  
-  
-    <article>
-      
   <header>
     
-      <h1 class="entry-title"><a href="/blog/2013/05/10/specifying-multiple-object-contexts-using-resourceful-routes/">Resourceful Routes in the Real World</a></h1>
+      <h1 class="entry-title">Resourceful Routes in the Real World</h1>
     
     
       <p class="meta">
@@ -106,7 +103,7 @@
   </header>
 
 
-  <div class="entry-content"><p>When designing a resourceful object hierarchy in Rails, often a single model has meaning in multiple different contexts.  Take for example an application managing rental properties. This application has two main models, Properties and Tenants.  These models have obvious relationships with each other. Relating a set of tenants to a specific property, for example.  These models also have value independent of this relationship. At <a href='http://www.whitepages.com'>WhitePages.com</a> we are often modeling entities that exist in many different contexts, somewhat like a graph. The question then becomes, how can I model a relationship such as a has_many/belongs_to using resourceful routes while still allowing direct root access to a model, or potentially access through several different model connections?. Can I access the same controller resource through different routes? The answer is yes.  Lets take a look at a basic example to see how we can make this happen.</p>
+<div class="entry-content"><p>When designing a resourceful object hierarchy in Rails, often a single model has meaning in multiple different contexts.  Take for example an application managing rental properties. This application has two main models, Properties and Tenants.  These models have obvious relationships with each other. Relating a set of tenants to a specific property, for example.  These models also have value independent of this relationship. At <a href='http://www.whitepages.com'>WhitePages.com</a> we are often modeling entities that exist in many different contexts, somewhat like a graph. The question then becomes, how can I model a relationship such as a has_many/belongs_to using resourceful routes while still allowing direct root access to a model, or potentially access through several different model connections?. Can I access the same controller resource through different routes? The answer is yes.  Lets take a look at a basic example to see how we can make this happen.</p>
 
 <p>Let&rsquo;s start with the following models:</p>
 
@@ -323,22 +320,16 @@ edit_property_tenant GET    /properties/:property_id/tenants/:id/edit(.:format) 
 
 <p>Now we can declare success. We now have the ability to access all our Tenants through a root route, as well as through their defined relationship through Properties using a nested route.</p>
 </div>
-  
-  
 
 
-    </article>
-  
-  
-    <article>
+  <footer>
+    <p class="meta">
       
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2013/05/08/thoughts-on-railsconf-2013/">Thoughts on RailsConf 2013</a></h1>
-    
-    
-      <p class="meta">
-        
+  
+
+<span class="byline author vcard">Posted by <span class="fn">Steve Saarinen</span></span>
+
+      
 
 
 
@@ -350,33 +341,46 @@ edit_property_tenant GET    /properties/:property_id/tenants/:id/edit(.:format) 
   
 
 
-<time datetime="2013-05-08T13:37:00-07:00" pubdate data-updated="true">May 8<span>th</span>, 2013</time>
-        
-      </p>
+<time datetime="2013-05-10T00:11:00-07:00" pubdate data-updated="true">May 10<span>th</span>, 2013</time>
+      
+
+<span class="categories">
+  
+    <a class='category' href='/blog/categories/rails/'>Rails</a>, <a class='category' href='/blog/categories/routing/'>Routing</a>, <a class='category' href='/blog/categories/ruby/'>Ruby</a>
+  
+</span>
+
+
+    </p>
     
-  </header>
-
-
-  <div class="entry-content"><p>I left Portland this year with mixed feelings after the four days of <a href='http://www.railsconf.com/2013/'>RailsConf 2013</a>. Listening to DHH&rsquo;s opening keynote outlining the focus of the technology decisions made for the Rails codebase, (specifically, a focus on document based UI rather than a richer, thick client UI) I was prepared to look at the Rails 4 featureset, and decisions made for this latest version, from that world view.  Through the rest of the conference, talks and technologies presented often were in direct conflict with this direction.  Talks focusing on utilization of the new web socket <a href='http://tenderlovemaking.com/2012/07/30/is-it-live.html'>&lsquo;Live Streaming&rsquo;</a> framework for Rails 4, a focus on &ldquo;Rails API&rdquo; architectures using thick clients and JSON transport mediums, and a recurring focus on JavaScript MVC libraries such as ember.js had me questioning whether the community is seeing and embracing the same &ldquo;Rails is document based&rdquo; vision as DHH.  I am in agreement with DHH&rsquo;s vision of not diluting the Rails stack to attempt to &ldquo;be everything to everyone&rdquo;, but enjoyed haring from those who are pushing their visions of where the stack should go.</p>
-
-<p>Several talks (such as one entitled &lsquo;Cache = Cash&rsquo;) demonstrated one alignment of the Rails community: the quest for performance.  Many of the new technologies for Rails 4, including the new (and contentious) <a href='https://github.com/rails/turbolinks/' target='_blank'>TurboLinks</a> framework, have been introduced to increase end user performance.  I am still on the fence regarding the usefulness of the <a href='https://github.com/rails/turbolinks/' target='_blank'>TurboLinks</a> framework, or even whether the implementation is fully baked enough for production web sites.  For example: when developing for an ad-supported application, dealing with third party JavaScript is a constant headache but a necessary evil.  Interrupting the standard request/response model of the web page (which <a href='https://github.com/rails/turbolinks/' target='_blank'>TurboLinks</a> does), and the browser events associated with these actions may have far reaching impacts on the viability of code that we have no organizational control over.  Opting out of the <a href='https://github.com/rails/turbolinks/' target='_blank'>TurboLinks</a> functionality seems to be grossly manual and error prone, requiring all generated links to be specifically marked up.  There may be ways around this but further investigation is needed. Fodder for another Blog post perhaps.</p>
-
-<p>All in all, my biggest takeaway from <a href='http://www.railsconf.com/2013/'>RailsConf 2013</a>. was motivation to contribute to the open source projects built to the benefit of a great many engineers and organization.  The inspiring work shown at the conference, and the people behind them, are truly the engine powering the growth we have seen in the Rails ecosystem.</p>
-
-<p>Countdown to RubyConf?</p>
+      <div class="sharing">
+  
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://saarinen.github.com/blog/2013/05/10/specifying-multiple-object-contexts-using-resourceful-routes/" data-via="_saarinen" data-counturl="http://saarinen.github.com/blog/2013/05/10/specifying-multiple-object-contexts-using-resourceful-routes/" >Tweet</a>
+  
+  
+  <div class="g-plusone" data-size="medium"></div>
+  
+  
 </div>
-  
-  
 
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/blog/2013/05/08/thoughts-on-railsconf-2013/" title="Previous Post: Thoughts on RailsConf 2013">&laquo; Thoughts on RailsConf 2013</a>
+      
+      
+    </p>
+  </footer>
+</article>
 
-    </article>
-  
-  <div class="pagination">
-    
-    <a href="/blog/archives">Blog Archives</a>
-    
-  </div>
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
 </div>
+  </section>
+
+</div>
+
 <aside class="sidebar">
   
     <section>
@@ -397,7 +401,7 @@ edit_property_tenant GET    /properties/:property_id/tenants/:id/edit(.:format) 
 <section>
   <h1>GitHub Repos</h1>
   <ul id="gh_repos">
-    <li class="loading">Status updating&#8230;</li>
+    <li class="loading">Status updating...</li>
   </ul>
   
   <a href="https://github.com/saarinen">@saarinen</a> on GitHub
@@ -440,7 +444,7 @@ edit_property_tenant GET    /properties/:property_id/tenants/:id/edit(.:format) 
 <section>
   <h1>Latest Tweets</h1>
   <ul id="tweets">
-    <li class="loading">Status updating&#8230;</li>
+    <li class="loading">Status updating...</li>
   </ul>
   <script type="text/javascript">
     $(function(){
@@ -457,6 +461,7 @@ edit_property_tenant GET    /properties/:property_id/tenants/:id/edit(.:format) 
   
 </aside>
 
+
     </div>
   </div>
   <footer role="contentinfo"><p>
@@ -471,7 +476,10 @@ edit_property_tenant GET    /properties/:property_id/tenants/:id/edit(.:format) 
       var disqus_shortname = 'saarinen';
       
         
-        var disqus_script = 'count.js';
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://saarinen.github.com/blog/2013/05/10/specifying-multiple-object-contexts-using-resourceful-routes/';
+        var disqus_url = 'http://saarinen.github.com/blog/2013/05/10/specifying-multiple-object-contexts-using-resourceful-routes/';
+        var disqus_script = 'embed.js';
       
     (function () {
       var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
