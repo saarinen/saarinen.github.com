@@ -103,7 +103,7 @@ end
 
 This gives us the following routes:
 
-<% codeblock %>
+{% codeblock %}
               Prefix Verb   URI Pattern                                         Controller#Action
              tenants GET    /tenants(.:format)                                  tenants#index
                      POST   /tenants(.:format)                                  tenants#create
@@ -129,7 +129,7 @@ edit_property_tenant GET    /properties/:property_id/tenants/:id/edit(.:format) 
                      PATCH  /properties/:id(.:format)                           properties#update
                      PUT    /properties/:id(.:format)                           properties#update
                      DELETE /properties/:id(.:format)                           properties#destroy
-<% endcodeblock %>
+{% endcodeblock %}
 
 Now we have both root access to our Tenants as well as routes through our properties relationship! Success! Well, not yet.  If we use any of the root routes to Tenants, our controller is going to throw an error, as property_id is not being sent along.  Let's fix that right now:
 
