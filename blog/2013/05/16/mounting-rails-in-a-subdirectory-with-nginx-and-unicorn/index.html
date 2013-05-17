@@ -1,0 +1,370 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>Mounting Rails in a Subdirectory with NGINX and Unicorn - ~/dev</title>
+  <meta name="author" content="Steve Saarinen">
+
+  
+  <meta name="description" content="Here at WhitePages, I&rsquo;ve been working on a Rails 4.0.rc1 application to serve third party integration functionality. I needed this service to &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://saarinen.github.com/blog/2013/05/16/mounting-rails-in-a-subdirectory-with-nginx-and-unicorn">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <link href="/atom.xml" rel="alternate" title="~/dev" type="application/atom+xml">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+  <script>!window.jQuery && document.write(unescape('%3Cscript src="./javascripts/lib/jquery.min.js"%3E%3C/script%3E'))</script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="http://fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
+  
+  <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-40738542-1']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
+
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">~/dev</a></h1>
+  
+    <h2>Musings on Ruby, Rails, and Web Technologies</h2>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="http://google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:saarinen.github.com" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/">Blog</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      <h1 class="entry-title">Mounting Rails in a Subdirectory With NGINX and Unicorn</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time class="updated" datetime="2013-05-16T13:58:00-07:00" pubdate data-updated="true">May 16<span>th</span>, 2013</time>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><p>Here at <a href="www.whitepages.com">WhitePages</a>, I&rsquo;ve been working on a Rails 4.0.rc1 application to serve third party integration functionality.  I needed this service to be available to all domains and sub-domains serviced by <a href="www.whitepages.com">WhitePages</a> ( of which there are several ), and I needed the application to be available on a same-origin basis for integration reasons.  These constraints necessitated deploying my new application mounted to a unique subdirectory that could be detected by the load balancer on any domain, and routed to our NGINX instance.  The question then becomes: &ldquo;How can I mount my Rails app on a subdirectory?&rdquo;  Let&rsquo;s take this step by step:</p>
+
+<h5>1: Letting Rails know it is mounted on a subdirectory</h5>
+
+
+<p>The first task to mark off the list is to tell Rails that the routes that it needs to generate and answer to will include a subdirectory.  Rails, thankfully, provides just such a configuration variable.  In keeping with Rails 4 conventions, I placed this config change in an intializer in config/initializers:</p>
+
+<figure class='code'><figcaption><span>config/initializers/mount_location.rb</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="c1"># Mount this application to a unique subdirectory</span>
+</span><span class='line'><span class="c1"># You can either use Rails.application.config or &lt;AppName&gt;::Application.config</span>
+</span><span class='line'><span class="o">&lt;</span><span class="no">AppName</span><span class="o">&gt;::</span><span class="no">Application</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">relative_url_root</span> <span class="o">=</span> <span class="s1">&#39;/my_directory&#39;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+<h5>2: Getting Rails to respond on a subdirectory</h5>
+
+
+<p>Now that rails knows that it is mounted on a subdirectory, we need to configure rack to pass requests on that subdirectory to our Rails application.  We do that by modifying the config.ru file in our application root:</p>
+
+<figure class='code'><figcaption><span>config.ru</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="c1"># This file is used by Rack-based servers to start the application.</span>
+</span><span class='line'>
+</span><span class='line'><span class="nb">require</span> <span class="o">::</span><span class="no">File</span><span class="o">.</span><span class="n">expand_path</span><span class="p">(</span><span class="s1">&#39;../config/environment&#39;</span><span class="p">,</span>  <span class="bp">__FILE__</span><span class="p">)</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">map</span> <span class="o">&lt;</span><span class="no">AppName</span><span class="o">&gt;::</span><span class="no">Application</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">relative_url_root</span> <span class="o">||</span> <span class="s2">&quot;/&quot;</span> <span class="k">do</span>
+</span><span class='line'>  <span class="n">run</span> <span class="no">Rails</span><span class="o">.</span><span class="n">application</span>
+</span><span class='line'><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Here we check to see if our application has been configured with a relative_url_root.  If so, we mount our rails app at that location.</p>
+
+<p>Starting up our Rails server, our application should now be responding on the subdirectory we mounted it on.  Success!! Well&hellip;not quite.  All of our static assets are responding correctly because they are being served from our Rails 4 application in development mode.  Time to make some NGINX configuration changes to make sure it looks for static assets in the right location when we are running in production mode&hellip;</p>
+
+<h5>3: Telling NGINX where my static assets are</h5>
+
+
+<p>OK, heres the problem, the following entry comes from the nginx site config file:</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>root &lt;path_to_my_app>/public;
+</span><span class='line'>
+</span><span class='line'>location / {
+</span><span class='line'>  if (!-f $request_filename) {
+</span><span class='line'>    proxy_pass http://&lt;unicorn_service_name>_workers;
+</span><span class='line'>    break;
+</span><span class='line'>  }
+</span><span class='line'>}</span></code></pre></td></tr></table></div></figure>
+
+
+<p>When a request comes to our application on our subdirectory path, for example <a href="http://test.com/our_path/assets/images/test.png,">http://test.com/our_path/assets/images/test.png,</a> NGINX will look in our public directory for a file mathing the path &lsquo;/our_path/assets/images/test.png&rsquo;.  The file doesn&rsquo;t exist there, it exists at &lsquo;/assets/images/test.png&rsquo;. How can we tell NGINX to drop our subdirectory from the path it is trying to locate our static assets from?  The answer lies in the <a href='http://wiki.nginx.org/HttpCoreModule#alias'>alias</a> directive.  Using alias, we can use a location matcher that matches our subdirectory, and nginx will drop the matched part of the path from the path it uses to search for our static files.  Let&rsquo;s look at the modified code:</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>root &lt;path_to_my_app>/public;
+</span><span class='line'>
+</span><span class='line'>location /our_path/ {
+</span><span class='line'>  alias &lt;path_to_my_app>/public/;
+</span><span class='line'>
+</span><span class='line'>  if (!-f $request_filename) {
+</span><span class='line'>    proxy_pass http://&lt;unicorn_service_name>_workers;
+</span><span class='line'>    break;
+</span><span class='line'>  }
+</span><span class='line'>}</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Success at last! Now NGINX is correctly searching our public directory for our apps static files, and our Rails 4 application is correctly responding to the routes containing the subdirectory and generating paths with our configured subdirectory.</p>
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">Steve Saarinen</span></span>
+
+      
+
+
+
+
+
+
+
+
+  
+
+
+<time class="updated" datetime="2013-05-16T13:58:00-07:00" pubdate data-updated="true">May 16<span>th</span>, 2013</time>
+      
+
+<span class="categories">
+  
+    <a class='category' href='/blog/categories/rails/'>Rails</a>, <a class='category' href='/blog/categories/nginx/'>nginx</a>, <a class='category' href='/blog/categories/unicorn/'>unicorn</a>
+  
+</span>
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://saarinen.github.com/blog/2013/05/16/mounting-rails-in-a-subdirectory-with-nginx-and-unicorn/" data-via="_saarinen" data-counturl="http://saarinen.github.com/blog/2013/05/16/mounting-rails-in-a-subdirectory-with-nginx-and-unicorn/" >Tweet</a>
+  
+  
+  <div class="g-plusone" data-size="medium"></div>
+  
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/blog/2013/05/10/specifying-multiple-object-contexts-using-resourceful-routes/" title="Previous Post: Resourceful Routes in the Real World">&laquo; Resourceful Routes in the Real World</a>
+      
+      
+    </p>
+  </footer>
+</article>
+
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+  </section>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2013/05/16/mounting-rails-in-a-subdirectory-with-nginx-and-unicorn/">Mounting Rails in a Subdirectory with NGINX and Unicorn</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2013/05/10/specifying-multiple-object-contexts-using-resourceful-routes/">Resourceful Routes in the Real World</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2013/05/08/thoughts-on-railsconf-2013/">Thoughts on RailsConf 2013</a>
+      </li>
+    
+  </ul>
+</section>
+
+<section class="googleplus googleplus-hidden">
+  <h1>
+    <a href="https://plus.google.com/103978239530400189300?rel=author">
+      <img src="http://www.google.com/images/icons/ui/gprofile_button-32.png" width="32" height="32">
+      Google+
+    </a>
+  </h1>
+</section>
+
+
+
+
+
+<section>
+  <h1>Latest Tweets</h1>
+  <ul id="tweets">
+    <li class="loading">Status updating...</li>
+  </ul>
+  <script type="text/javascript">
+    $(function(){
+      getTwitterFeed("_saarinen", 5, false);
+    });
+  </script>
+  <script src="/javascripts/twitter.js" type="text/javascript"> </script>
+  
+    <a href="http://twitter.com/_saarinen" class="twitter-follow-button" data-show-count="">Follow @_saarinen</a>
+  
+</section>
+
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2013 - Steve Saarinen -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'saarinen';
+      
+        
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://saarinen.github.com/blog/2013/05/16/mounting-rails-in-a-subdirectory-with-nginx-and-unicorn/';
+        var disqus_url = 'http://saarinen.github.com/blog/2013/05/16/mounting-rails-in-a-subdirectory-with-nginx-and-unicorn/';
+        var disqus_script = 'embed.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = 'http://' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+
+
+  <script type="text/javascript">
+    (function() {
+      var script = document.createElement('script'); script.type = 'text/javascript'; script.async = true;
+      script.src = 'https://apis.google.com/js/plusone.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(script, s);
+    })();
+  </script>
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = 'http://platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>

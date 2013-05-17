@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: nginx | ~/dev]]></title>
+  <link href="http://saarinen.github.com/blog/categories/nginx/atom.xml" rel="self"/>
+  <link href="http://saarinen.github.com/"/>
+  <updated>2013-05-17T14:02:08-07:00</updated>
+  <id>http://saarinen.github.com/</id>
+  <author>
+    <name><![CDATA[Steve Saarinen]]></name>
+    
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[Mounting Rails in a Subdirectory with NGINX and Unicorn]]></title>
+    <link href="http://saarinen.github.com/blog/2013/05/16/mounting-rails-in-a-subdirectory-with-nginx-and-unicorn/"/>
+    <updated>2013-05-16T13:58:00-07:00</updated>
+    <id>http://saarinen.github.com/blog/2013/05/16/mounting-rails-in-a-subdirectory-with-nginx-and-unicorn</id>
+    <content type="html"><![CDATA[<p>Here at <a href="www.whitepages.com">WhitePages</a>, I&rsquo;ve been working on a Rails 4.0.rc1 application to serve third party integration functionality.  I needed this service to be available to all domains and sub-domains serviced by <a href="www.whitepages.com">WhitePages</a> ( of which there are several ), and I needed the application to be available on a same-origin basis for integration reasons.  These constraints necessitated deploying my new application mounted to a unique subdirectory that could be detected by the load balancer on any domain, and routed to our NGINX instance.  The question then becomes: &ldquo;How can I mount my Rails app on a subdirectory?&rdquo;  Let&rsquo;s take this step by step:</p>
+
+<h5>1: Letting Rails know it is mounted on a subdirectory</h5>
+
+
+<p>The first task to mark off the list is to tell Rails that the routes that it needs to generate and answer to will include a subdirectory.  Rails, thankfully, provides just such a configuration variable.  In keeping with Rails 4 conventions, I placed this config change in an intializer in config/initializers:</p>
+
+<p>``` ruby config/initializers/mount_location.rb</p>
+
+<h1>Mount this application to a unique subdirectory</h1>
+
+<h1>You can either use Rails.application.config or <AppName>::Application.config</h1>
+
+<p><AppName>::Application.config.relative_url_root = &lsquo;/my_directory&rsquo;
+```</p>
+
+<h5>2: Getting Rails to respond on a subdirectory</h5>
+
+
+<p>Now that rails knows that it is mounted on a subdirectory, we need to configure rack to pass requests on that subdirectory to our Rails application.  We do that by modifying the config.ru file in our application root:</p>
+
+<p>``` ruby config.ru</p>
+
+<h1>This file is used by Rack-based servers to start the application.</h1>
+
+<p>require ::File.expand_path(&lsquo;../config/environment&rsquo;,  <strong>FILE</strong>)</p>
+
+<p>map <AppName>::Application.config.relative_url_root || &ldquo;/&rdquo; do
+  run Rails.application
+end
+```</p>
+
+<p>Here we check to see if our application has been configured with a relative_url_root.  If so, we mount our rails app at that location.</p>
+
+<p>Starting up our Rails server, our application should now be responding on the subdirectory we mounted it on.  Success!! Well&hellip;not quite.  All of our static assets are responding correctly because they are being served from our Rails 4 application in development mode.  Time to make some NGINX configuration changes to make sure it looks for static assets in the right location when we are running in production mode&hellip;</p>
+
+<h5>3: Telling NGINX where my static assets are</h5>
+
+
+<p>OK, heres the problem, the following entry comes from the nginx site config file:</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>root &lt;path_to_my_app>/public;&lt;/p>
+</span><span class='line'>
+</span><span class='line'>&lt;p>location / {
+</span><span class='line'>  if (!-f $request_filename) {&lt;/p>
+</span><span class='line'>
+</span><span class='line'>&lt;pre>&lt;code>proxy_pass http://&lt;unicorn_service_name&gt;_workers;
+</span><span class='line'>break;
+</span><span class='line'>&lt;/code>&lt;/pre>
+</span><span class='line'>
+</span><span class='line'>&lt;p>  }
+</span><span class='line'>}</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p>When a request comes to our application on our subdirectory path, for example <a href="http://test.com/our_path/assets/images/test.png,">http://test.com/our_path/assets/images/test.png,</a> NGINX will look in our public directory for a file mathing the path &lsquo;/our_path/assets/images/test.png&rsquo;.  The file doesn&rsquo;t exist there, it exists at &lsquo;/assets/images/test.png&rsquo;. How can we tell NGINX to drop our subdirectory from the path it is trying to locate our static assets from?  The answer lies in the <a href='http://wiki.nginx.org/HttpCoreModule#alias'>alias</a> directive.  Using alias, we can use a location matcher that matches our subdirectory, and nginx will drop the matched part of the path from the path it uses to search for our static files.  Let&rsquo;s look at the modified code:</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>root &lt;path_to_my_app>/public;&lt;/p>
+</span><span class='line'>
+</span><span class='line'>&lt;p>location /our_path/ {
+</span><span class='line'>  alias &lt;path_to_my_app>/public/;&lt;/p>
+</span><span class='line'>
+</span><span class='line'>&lt;p>  if (!-f $request_filename) {&lt;/p>
+</span><span class='line'>
+</span><span class='line'>&lt;pre>&lt;code>proxy_pass http://&lt;unicorn_service_name&gt;_workers;
+</span><span class='line'>break;
+</span><span class='line'>&lt;/code>&lt;/pre>
+</span><span class='line'>
+</span><span class='line'>&lt;p>  }
+</span><span class='line'>}</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p>Success at last! Now NGINX is correctly searching our public directory for our apps static files, and our Rails 4 application is correctly responding to the routes containing the subdirectory and generating paths with our configured subdirectory.</p>
+]]></content>
+  </entry>
+  
+</feed>
