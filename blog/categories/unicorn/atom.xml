@@ -4,7 +4,7 @@
   <title><![CDATA[Category: unicorn | ~/dev]]></title>
   <link href="http://saarinen.github.com/blog/categories/unicorn/atom.xml" rel="self"/>
   <link href="http://saarinen.github.com/"/>
-  <updated>2013-05-17T14:02:08-07:00</updated>
+  <updated>2013-05-17T14:22:40-07:00</updated>
   <id>http://saarinen.github.com/</id>
   <author>
     <name><![CDATA[Steve Saarinen]]></name>
@@ -52,7 +52,7 @@ end
 
 <p>Here we check to see if our application has been configured with a relative_url_root.  If so, we mount our rails app at that location.</p>
 
-<p>Starting up our Rails server, our application should now be responding on the subdirectory we mounted it on.  Success!! Well&hellip;not quite.  All of our static assets are responding correctly because they are being served from our Rails 4 application in development mode.  Time to make some NGINX configuration changes to make sure it looks for static assets in the right location when we are running in production mode&hellip;</p>
+<p>Starting up our Rails server, our application should now be responding on the subdirectory we mounted it on.  Success!! Well&hellip;not quite.  All of our static assets are currently responding correctly because they are being served from our Rails 4 application in development mode.  When running in production mode, all my static assets are failing to load?  What is going on? It looks like NGINX is not resolving paths to my static assets correctly.  Time to make some NGINX configuration changes to make sure it looks for static assets in the right location when we are running in production mode&hellip;</p>
 
 <h5>3: Telling NGINX where my static assets are</h5>
 
