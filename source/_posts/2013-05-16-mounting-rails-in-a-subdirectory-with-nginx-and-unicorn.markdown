@@ -40,31 +40,33 @@ Starting up our Rails server, our application should now be responding on the su
 
 OK, heres the problem, the following entry comes from the nginx site config file:
 
-{% codeblock %}
+``` nginx nginx.conf
 root <path_to_my_app>/public;
 
-location / {
-  if (!-f $request_filename) {
-    proxy_pass http://<unicorn_service_name>_workers;
-    break;
-  }
+location @proxy_to_app {
+  proxy_pass http://<%= @service_name %>_workers;
 }
-{% endcodeblock %}
+
+location / {
+  try_files $uri $uri/ @proxy_to_app;
+}
+```
 
 When a request comes to our application on our subdirectory path, for example http://test.com/our_path/assets/images/test.png, NGINX will look in our public directory for a file mathing the path '/our_path/assets/images/test.png'.  The file doesn't exist there, it exists at '/assets/images/test.png'. How can we tell NGINX to drop our subdirectory from the path it is trying to locate our static assets from?  The answer lies in the <a href='http://wiki.nginx.org/HttpCoreModule#alias'>alias</a> directive.  Using the alias directive, we can use a location matcher that matches our subdirectory and NGINX will drop the matched element of our location from the static asset search path.  Let's look at the modified code:
 
-{% codeblock %}
+``` nginx nginx.conf
 root <path_to_my_app>/public;
+
+location @proxy_to_app {
+  proxy_pass http://<%= @service_name %>_workers;
+}
 
 location /our_path/ {
   alias <path_to_my_app>/public/;
 
-  if (!-f $request_filename) {
-    proxy_pass http://<unicorn_service_name>_workers;
-    break;
-  }
+  try_files $uri $uri/ @proxy_to_app;
 }
-{% endcodeblock %}
+```
 
 Success at last! Now NGINX is correctly searching our public directory for our apps static files, and our Rails 4 application is correctly responding to the routes containing the subdirectory and generating paths with our configured subdirectory.
 
