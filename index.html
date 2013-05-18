@@ -156,7 +156,7 @@
 
 <p>OK, heres the problem, the following entry comes from the nginx site config file:</p>
 
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<figure class='code'><figcaption><span>nginx.conf</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
 <span class='line-number'>3</span>
 <span class='line-number'>4</span>
@@ -164,19 +164,22 @@
 <span class='line-number'>6</span>
 <span class='line-number'>7</span>
 <span class='line-number'>8</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>root &lt;path_to_my_app>/public;
+<span class='line-number'>9</span>
+</pre></td><td class='code'><pre><code class='nginx'><span class='line'><span class="k">root</span> <span class="s">&lt;path_to_my_app&gt;/public</span><span class="p">;</span>
 </span><span class='line'>
-</span><span class='line'>location / {
-</span><span class='line'>  if (!-f $request_filename) {
-</span><span class='line'>    proxy_pass http://&lt;unicorn_service_name>_workers;
-</span><span class='line'>    break;
-</span><span class='line'>  }
-</span><span class='line'>}</span></code></pre></td></tr></table></div></figure>
+</span><span class='line'><span class="k">location</span> <span class="s">@proxy_to_app</span> <span class="p">{</span>
+</span><span class='line'>  <span class="kn">proxy_pass</span> <span class="s">http://&lt;%=</span> <span class="s">@service_name</span> <span class="s">%&gt;_workers</span><span class="p">;</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">location</span> <span class="s">/</span> <span class="p">{</span>
+</span><span class='line'>  <span class="kn">try_files</span> <span class="nv">$uri</span> <span class="nv">$uri/</span> <span class="s">@proxy_to_app</span><span class="p">;</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
 
 
 <p>When a request comes to our application on our subdirectory path, for example <a href="http://test.com/our_path/assets/images/test.png,">http://test.com/our_path/assets/images/test.png,</a> NGINX will look in our public directory for a file mathing the path &lsquo;/our_path/assets/images/test.png&rsquo;.  The file doesn&rsquo;t exist there, it exists at &lsquo;/assets/images/test.png&rsquo;. How can we tell NGINX to drop our subdirectory from the path it is trying to locate our static assets from?  The answer lies in the <a href='http://wiki.nginx.org/HttpCoreModule#alias'>alias</a> directive.  Using the alias directive, we can use a location matcher that matches our subdirectory and NGINX will drop the matched element of our location from the static asset search path.  Let&rsquo;s look at the modified code:</p>
 
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<figure class='code'><figcaption><span>nginx.conf</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
 <span class='line-number'>3</span>
 <span class='line-number'>4</span>
@@ -186,16 +189,19 @@
 <span class='line-number'>8</span>
 <span class='line-number'>9</span>
 <span class='line-number'>10</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>root &lt;path_to_my_app>/public;
+<span class='line-number'>11</span>
+</pre></td><td class='code'><pre><code class='nginx'><span class='line'><span class="k">root</span> <span class="s">&lt;path_to_my_app&gt;/public</span><span class="p">;</span>
 </span><span class='line'>
-</span><span class='line'>location /our_path/ {
-</span><span class='line'>  alias &lt;path_to_my_app>/public/;
+</span><span class='line'><span class="k">location</span> <span class="s">@proxy_to_app</span> <span class="p">{</span>
+</span><span class='line'>  <span class="kn">proxy_pass</span> <span class="s">http://&lt;%=</span> <span class="s">@service_name</span> <span class="s">%&gt;_workers</span><span class="p">;</span>
+</span><span class='line'><span class="p">}</span>
 </span><span class='line'>
-</span><span class='line'>  if (!-f $request_filename) {
-</span><span class='line'>    proxy_pass http://&lt;unicorn_service_name>_workers;
-</span><span class='line'>    break;
-</span><span class='line'>  }
-</span><span class='line'>}</span></code></pre></td></tr></table></div></figure>
+</span><span class='line'><span class="k">location</span> <span class="s">/our_path/</span> <span class="p">{</span>
+</span><span class='line'>  <span class="kn">alias</span> <span class="s">&lt;path_to_my_app&gt;/public/</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="kn">try_files</span> <span class="nv">$uri</span> <span class="nv">$uri/</span> <span class="s">@proxy_to_app</span><span class="p">;</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
 
 
 <p>Success at last! Now NGINX is correctly searching our public directory for our apps static files, and our Rails 4 application is correctly responding to the routes containing the subdirectory and generating paths with our configured subdirectory.</p>
