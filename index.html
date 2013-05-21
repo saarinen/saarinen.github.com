@@ -163,17 +163,13 @@
 <span class='line-number'>5</span>
 <span class='line-number'>6</span>
 <span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
 </pre></td><td class='code'><pre><code class='nginx'><span class='line'><span class="k">root</span> <span class="s">&lt;path_to_my_app&gt;/public</span><span class="p">;</span>
 </span><span class='line'>
 </span><span class='line'><span class="k">location</span> <span class="s">@proxy_to_app</span> <span class="p">{</span>
 </span><span class='line'>  <span class="kn">proxy_pass</span> <span class="s">http://&lt;%=</span> <span class="s">@service_name</span> <span class="s">%&gt;_workers</span><span class="p">;</span>
 </span><span class='line'><span class="p">}</span>
 </span><span class='line'>
-</span><span class='line'><span class="k">location</span> <span class="s">/</span> <span class="p">{</span>
-</span><span class='line'>  <span class="kn">try_files</span> <span class="nv">$uri</span> <span class="nv">$uri/</span> <span class="s">@proxy_to_app</span><span class="p">;</span>
-</span><span class='line'><span class="p">}</span>
+</span><span class='line'><span class="k">try_files</span> <span class="nv">$uri</span> <span class="s">@proxy_to_app</span><span class="p">;</span>
 </span></code></pre></td></tr></table></div></figure>
 
 
@@ -190,6 +186,8 @@
 <span class='line-number'>9</span>
 <span class='line-number'>10</span>
 <span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
 </pre></td><td class='code'><pre><code class='nginx'><span class='line'><span class="k">root</span> <span class="s">&lt;path_to_my_app&gt;/public</span><span class="p">;</span>
 </span><span class='line'>
 </span><span class='line'><span class="k">location</span> <span class="s">@proxy_to_app</span> <span class="p">{</span>
@@ -199,8 +197,10 @@
 </span><span class='line'><span class="k">location</span> <span class="s">/our_path/</span> <span class="p">{</span>
 </span><span class='line'>  <span class="kn">alias</span> <span class="s">&lt;path_to_my_app&gt;/public/</span><span class="p">;</span>
 </span><span class='line'>
-</span><span class='line'>  <span class="kn">try_files</span> <span class="nv">$uri</span> <span class="nv">$uri/</span> <span class="s">@proxy_to_app</span><span class="p">;</span>
+</span><span class='line'>  <span class="kn">try_files</span> <span class="nv">$uri</span> <span class="s">@proxy_to_app</span><span class="p">;</span>
 </span><span class='line'><span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">try_files</span> <span class="nv">$uri</span> <span class="s">@proxy_to_app</span><span class="p">;</span>
 </span></code></pre></td></tr></table></div></figure>
 
 
