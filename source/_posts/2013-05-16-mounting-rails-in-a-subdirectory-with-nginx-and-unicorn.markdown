@@ -47,9 +47,7 @@ location @proxy_to_app {
   proxy_pass http://<%= @service_name %>_workers;
 }
 
-location / {
-  try_files $uri $uri/ @proxy_to_app;
-}
+try_files $uri @proxy_to_app;
 ```
 
 When a request comes to our application on our subdirectory path, for example http://test.com/our_path/assets/images/test.png, NGINX will look in our public directory for a file mathing the path '/our_path/assets/images/test.png'.  The file doesn't exist there, it exists at '/assets/images/test.png'. How can we tell NGINX to drop our subdirectory from the path it is trying to locate our static assets from?  The answer lies in the <a href='http://wiki.nginx.org/HttpCoreModule#alias'>alias</a> directive.  Using the alias directive, we can use a location matcher that matches our subdirectory and NGINX will drop the matched element of our location from the static asset search path.  Let's look at the modified code:
@@ -64,8 +62,10 @@ location @proxy_to_app {
 location /our_path/ {
   alias <path_to_my_app>/public/;
 
-  try_files $uri $uri/ @proxy_to_app;
+  try_files $uri @proxy_to_app;
 }
+
+try_files $uri @proxy_to_app;
 ```
 
 Success at last! Now NGINX is correctly searching our public directory for our apps static files, and our Rails 4 application is correctly responding to the routes containing the subdirectory and generating paths with our configured subdirectory.
