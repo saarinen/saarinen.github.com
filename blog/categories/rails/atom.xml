@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Rails | ~/dev]]></title>
   <link href="http://saarinen.github.com/blog/categories/rails/atom.xml" rel="self"/>
   <link href="http://saarinen.github.com/"/>
-  <updated>2013-05-21T16:23:41-07:00</updated>
+  <updated>2013-05-22T10:48:41-07:00</updated>
   <id>http://saarinen.github.com/</id>
   <author>
     <name><![CDATA[Steve Saarinen]]></name>
@@ -12,6 +12,28 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[To Engine or Not To Engine?]]></title>
+    <link href="http://saarinen.github.com/blog/2013/05/21/to-engine-or-not-to-engine/"/>
+    <updated>2013-05-21T19:51:00-07:00</updated>
+    <id>http://saarinen.github.com/blog/2013/05/21/to-engine-or-not-to-engine</id>
+    <content type="html"><![CDATA[<h5>&lt;tl-dr&gt;</h5>
+
+
+<p>Rails purist wants to use Rails Engines only for the separation of development concerns to support Follow-The-Sun development. Accepting criticism, constructive or otherwise, on this idea.<h5>&lt;/tl-dr&gt;</h5></p>
+
+<p>Is breaking up a Rails application into engines based only on development coordination a Rails anti-pattern?  Or does splitting an application along logical lines for development make sense in an environment with disparate teams?  <a href='http://www.whitepages.com'>WhitePages</a>, like many other Ruby and Rails shops, has been struggling with the current hyper-competitive marketplace for talented engineers.  <a href='http://www.whitepages.com'>WhitePages</a> maintains very high standards for it&rsquo;s engineering teams (with the exception of the author) and has been forced to widen its search for talent not only nationwide, but globally.  Our team has been fortunate enough to find an extremely talented Ruby and Rails engineer in Hungary.  Now comes the real challenge: How do we integrate and coordinate development? As many engineering teams have experienced, follow-the-sun-development introduces several challenges for coordination of development efforts.  As an Agile team, the lack of overlapping work hours and limited communication exacerbates these issues.  Can Rails Engines provide us a mechanism to break down our project into parts that can be easier managed by co-located teams?</p>
+
+<p>With a nine hour time differential, our daily overlap is extremely limited.  We needed a way to allow the remote team to work independently without cross dependencies, eliminating as much as possible blocking events to one team caused by another.  These events generally mean at the least, a several man-hour loss of productivity as changes are rolled back or corrections made to the offending code or systems.  The answer seems to lie in separating development concerns between the two teams as much as possible.  Enter Rails Engines.</p>
+
+<p>Conventionally, Rails Engines solve a code redundancy problem.  A common Rails mantra is Don&rsquo;t Repeat Yourself (DRY). When a piece of functionality is used across several applications, Engines solve the problem of repeated code by making the redundant code portable and easily shared among applications.  Functionality like user authentication, role management, and application administration are commonly implemented as Rails Engines.  What we wanted to do was make use of Engines, not solely for DRY purposes, but to divide a single application into smaller, easily digestible sections to be implemented in parallel, independent of each other.  Let&rsquo;s illustrate with an example:</p>
+
+<p><a href='http://names.whitepages.com'>WhitePages Names (names.whitepages.com)</a> and <a href='http://phones.whitepages.com'>WhitePages Phones (phones.whitepages.com)</a> allow for index-like browsing of <a href='http://www.whitepages.com'>WhitePages</a> data.  Both pieces of functionality share the same application layout and branding, navigation, advertising, etc, but are clearly distinguishable in terms of functionality.  This functionality is unique to the <a href='http://www.whitepages.com'>WhitePages</a> app and not repeated on any other <a href='http://www.whitepages.com'>WhitePages</a> managed properties.  By implementing both of these features as full Rails Engines rather than implementing them within the <a href='http://www.whitepages.com'>WhitePages</a> application itself, we have sectioned off two well defined pieces of development that can be worked on independent from one another, and in relative isolation.  The only moving part should be the application that they both share.  If implemented correctly, there shouldn&rsquo;t be any dependencies on each other or the application itself, drastically limiting the chances of a team effecting the productivity of another.  Quality control and performance management is clearer, and bugs introduced into production can be rolled back easily with a change to the Gemfile of the host application, without having to roll back the code of the host application or any other engines included in that application.  This is a huge win for taking some of the bite out of the potential complications of globalized development.</p>
+
+<p>As somewhat of a Rails purist myself, I was initially resistant to this idea.  In my mind, Engines were purely a DRY containment structure wrapped in an elegant deployment mechanism.  The model described above does not fit that description.  The benefits to the development life cycle however, have won me over.  I&rsquo;m curious what the community thinks about this paradigm.  A Rails anti-pattern? Or a valid use of a utilitarian technology?  Sound off in the comments or hit me up on twitter @_saarinen &hellip;</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Mounting a Rails 4 App in a Subdirectory using NGINX]]></title>
